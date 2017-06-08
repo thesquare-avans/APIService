@@ -2,9 +2,10 @@ exports.up = (pgm) => {
 	pgm.createTable("user", {
 		id: {
 			type: "uuid",
-			default: pgm.func("gen_random_uuid()")
+			default: pgm.func("gen_random_uuid()"),
+			primaryKey: true
 		},
-		hash: {
+		keyHash: {
 			type: "character varying",
 			notNull: true,
 			unique: true
