@@ -1,0 +1,32 @@
+{
+  "name": "thesquare-api",
+  "version": "1.0.0",
+  "description": "The Square API server",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thesquare-avans/APIService.git"
+  },
+  "author": "Ruben Rutten <ruben@rubenrutten.nl>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/thesquare-avans/APIService/issues"
+  },
+  "homepage": "https://github.com/thesquare-avans/APIService#readme",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "config": "^1.26.1",
+    "es6-request": "^2.1.7",
+    "express": "^4.15.3",
+    "gm": "^1.23.0",
+    "md5": "^2.2.1",
+    "morgan": "^1.8.2",
+    "node-pg-migrate": "^2.2.1",
+    "pg": "^6.2.3",
+    "redis": "^2.7.1",
+    "sql-template-strings": "^2.2.2"
+  }
+}
