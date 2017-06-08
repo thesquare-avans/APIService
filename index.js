@@ -24,7 +24,7 @@ app.use(middleware.verify);
 
 app.get("/", (req, res) => {
 	res.sign({
-		test: "Test response"
+		test: "Test response2"
 	});
 });
 
