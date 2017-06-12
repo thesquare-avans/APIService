@@ -2,6 +2,8 @@ const router = require("express").Router();
 const crypto = require("crypto");
 const db = require("../lib/db");
 
+router.use("/streams", require("./streams"));
+
 router.get("/me", (req, res) => {
 	res.status(200).sign({
 		success: true,

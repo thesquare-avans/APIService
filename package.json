@@ -22,10 +22,12 @@
     "es6-request": "^2.1.7",
     "express": "^4.15.3",
     "gm": "^1.23.0",
+    "minimist": "^1.2.0",
     "morgan": "^1.8.2",
     "node-pg-migrate": "^2.2.1",
     "pg": "^6.2.3",
     "redis": "^2.7.1",
-    "sql-template-strings": "^2.2.2"
+    "sql-template-strings": "^2.2.2",
+    "swagger-node-express": "^2.1.3"
   }
 }
