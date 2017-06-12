@@ -62,3 +62,4 @@ config/
 
 *.sublime-workspace
 *.sublime-project
+documentation/

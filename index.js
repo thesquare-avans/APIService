@@ -14,10 +14,6 @@ const app = express();
 app.use(middleware.cors);
 app.use(require("morgan")(config.get("http.log")));
 app.use(require("body-parser").json());
-app.use((req, res, next) => {
-	res.setHeader("Access-Control-Allow-Origin", "*");
-	next();
-});
 app.use(middleware.sign);
 app.use(middleware.user);
 app.use(middleware.verify);
