@@ -1,6 +1,8 @@
 const config = require("config");
 const express = require("express");
 const middleware = require("./lib/middleware");
+const discovery = require("./lib/discovery");
+const uuid = require("uuid");
 
 const fs = require("fs");
 const path = require("path");
@@ -12,6 +14,10 @@ require("./lib/redis");
 const app = express();
 
 app.use(middleware.cors);
+app.use((req, res, next) => {
+	req.id = uuid();
+	next();
+});
 app.use(require("morgan")(config.get("http.log")));
 app.use(require("body-parser").text({
 	type: "application/json"

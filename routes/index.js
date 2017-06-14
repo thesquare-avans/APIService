@@ -3,6 +3,7 @@ const crypto = require("crypto");
 const db = require("../lib/db");
 
 router.use("/streams", require("./streams"));
+router.use("/status", require("./status"));
 
 router.get("/me", (req, res) => {
 	res.status(200).sign({
