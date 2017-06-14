@@ -15,11 +15,12 @@ require("./lib/redis");
 const app = express();
 
 app.use(health.middleware.timings);
-app.use(middleware.cors);
 app.use((req, res, next) => {
 	req.id = uuid();
+	res.setHeader("X-ServedBy", config.get("serverId"));
 	next();
 });
+app.use(middleware.cors);
 app.use(require("morgan")(config.get("http.log")));
 app.use(require("body-parser").text({
 	type: "application/json"
