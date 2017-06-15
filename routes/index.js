@@ -34,7 +34,7 @@ router.post("/register", (req, res) => {
 		VALUES
 			(
 				${hash.digest("base64")},
-				${req.body.payload.name}
+				${req.payload.name}
 			)
 		RETURNING *
 	`)
