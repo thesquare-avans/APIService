@@ -243,11 +243,45 @@ router.delete("/:streamId", (req, res) => {
 			});
 		}
 
-		return streams.remove(stream.id)
-		.then(() => {
-			return res.status(200).sign({
-				success: true
+		return discovery.send("stop", {
+			streamId: stream.id,
+			chatServer: {
+				type: "chat",
+				id: stream.chatServer.id
+			},
+			streamingServer: {
+				type: "streaming",
+				id: stream.streamingServer.id
+			},
+			reason: "manuallyStopped"
+		}, true, 10000)
+		.then((response) => {
+			if(response.success) {
+				return streams.remove(stream.id)
+				.then((stream) => {
+					return res.status(200).sign({
+						success: true,
+						chatServer: response.chatServer,
+						streamingServer: response.streamingServer
+					});
+				});	
+			}
+
+			return res.status(500).sign({
+				success: false,
+				error: {
+					code: response.error.code
+				}
 			});
+		})
+		.catch((err) => {
+			console.error("[Discovery/Stop]", err);
+			res.status(500).sign({
+				success: false,
+				error: {
+					code: "unknownError"
+				}
+			})
 		});
 	})
 	.catch((err) => {
