@@ -4,6 +4,7 @@ const db = require("../lib/db");
 
 router.use("/streams", require("./streams"));
 router.use("/status", require("./status"));
+router.use("/users", require("./users"));
 
 router.get("/me", (req, res) => {
 	res.status(200).sign({
@@ -29,12 +30,14 @@ router.post("/register", (req, res) => {
 		INSERT INTO
 			public.user (
 				"keyHash",
-				"name"
+				"name",
+				"publicKey"
 			)
 		VALUES
 			(
 				${hash.digest("base64")},
-				${req.payload.name}
+				${req.payload.name},
+				${req.headers['x-publickey']}
 			)
 		RETURNING *
 	`)
@@ -54,10 +57,6 @@ router.post("/register", (req, res) => {
 			}
 		});
 	});
-});
-
-router.post("/users", (req, res) => {
-
 });
 
 module.exports = router;
