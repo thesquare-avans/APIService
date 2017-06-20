@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const streams = require("../lib/streams");
 const discovery = require("../lib/discovery");
+const users = require("../lib/users");
 
 router.get("/", (req, res) => {
 	streams.getAll()
@@ -257,14 +258,25 @@ router.delete("/:streamId", (req, res) => {
 		}, true, 10000)
 		.then((response) => {
 			if(response.success) {
-				return streams.remove(stream.id)
-				.then((stream) => {
+				var satoshi = stream.satoshi;
+				if(response.streamingServer && response.streamingServer.satoshi) {
+					var satoshiResponse = parseInt(response.streamingServer.satoshi);
+					if(!isNaN(satoshiResponse)) {
+						satoshi = satoshiResponse;
+					}
+				}
+
+				return users.updateSatoshi(req.user.id, satoshi)
+				.then(() => {
+					return streams.remove(stream.id)
+				})
+				.then(() => {
 					return res.status(200).sign({
 						success: true,
 						chatServer: response.chatServer,
 						streamingServer: response.streamingServer
 					});
-				});	
+				});
 			}
 
 			return res.status(500).sign({
