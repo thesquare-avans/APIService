@@ -1,7 +1,5 @@
 const router = require("express").Router();
 const streams = require("../lib/streams");
-const discovery = require("../lib/discovery");
-const users = require("../lib/users");
 
 router.get("/", (req, res) => {
 	streams.getAll()
@@ -23,82 +21,16 @@ router.get("/", (req, res) => {
 });
 
 router.post("/", (req, res) => {
-	streams.getByOwner(req.user.id)
-	.then((stream) => {
-		if(stream) {
-			return res.status(403).sign({
-				success: false,
-				streamId: stream.id,
-				error: {
-					code: "streams#alreadyStreaming"
-				}
-			});
+	streams.create({
+		streamer: req.user,
+		title: req.payload.title
+	})
+	.then((response) => {
+		if(response.status == 201) {
+			return res.status(201).sign(response.data);
 		}
 
-		if(!req.payload.title) {
-			return res.status(400).sign({
-				success: false,
-				error: {
-					code: "streams#titleMissing"
-				}
-			});
-		}
-
-		if(typeof req.payload.title != "string") {
-			return res.status(400).sign({
-				success: false,
-				error: {
-					code: "streams#titleInvalid"
-				}
-			});
-		}
-
-		var data = {
-			title: req.payload.title,
-			owner: req.user
-		};
-
-		return streams.create(data)
-		.then((stream) => {
-			return discovery.send("start", {
-				streamId: stream.id,
-				streamer: req.user,
-				title: stream.title
-			}, true, 10000)
-			.then((response) => {
-				if(response.success) {
-					return streams.update(stream.id, {
-						title: stream.title,
-						streamingServer: response.data.streaming,
-						chatServer: response.data.chat
-					})
-					.then((stream) => {
-						return res.status(201).sign({
-							success: true,
-							stream: stream
-						});
-					});	
-				}
-
-				streams.remove(stream.id);
-
-				return res.status(500).sign({
-					success: false,
-					error: {
-						code: response.error.code
-					}
-				});
-			})
-			.catch((err) => {
-				console.error("[Discovery/Start]", err);
-				res.status(500).sign({
-					success: false,
-					error: {
-						code: "unknownError"
-					}
-				})
-			});
-		});
+		return res.status(response.status).sign(response.data);
 	})
 	.catch((err) => {
 		res.status(500).sign({
@@ -111,30 +43,9 @@ router.post("/", (req, res) => {
 });
 
 router.get("/:streamId", (req, res) => {
-	if(typeof req.params.streamId != "string" || /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(req.params.streamId) == false) {
-		return res.status(400).sign({
-			success: false,
-			error: {
-				code: "invalidParameter"
-			}
-		});
-	}
-
 	streams.get(req.params.streamId)
-	.then((stream) => {
-		if(!stream) {
-			return res.status(404).sign({
-				success: false,
-				error: {
-					code: "resourceNotFound"
-				}
-			});	
-		}
-
-		res.sign({
-			success: true,
-			stream: stream
-		});
+	.then((response) => {
+		res.status(response.status).sign(response.data);
 	})
 	.catch((err) => {
 		res.status(500).sign({
@@ -147,62 +58,9 @@ router.get("/:streamId", (req, res) => {
 });
 
 router.put("/:streamId", (req, res) => {
-	if(typeof req.params.streamId != "string" || /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(req.params.streamId) == false) {
-		return res.status(400).sign({
-			success: false,
-			error: {
-				code: "invalidParameter"
-			}
-		});
-	}
-
-	streams.get(req.params.streamId)
-	.then((stream) => {
-		if(!stream) {
-			return res.status(404).sign({
-				success: false,
-				error: {
-					code: "resourceNotFound"
-				}
-			});	
-		}
-
-		if(stream.ownerId != req.user.id) {
-			return res.status(403).sign({
-				success: false,
-				error: {
-					code: "streams#notStreamOwner"
-				}
-			});
-		}
-
-		if(!req.payload.title) {
-			return res.status(400).sign({
-				success: false,
-				error: {
-					code: "streams#titleMissing"
-				}
-			});
-		}
-
-		if(typeof req.payload.title != "string") {
-			return res.status(400).sign({
-				success: false,
-				error: {
-					code: "streams#titleInvalid"
-				}
-			});
-		}
-
-		return streams.update(req.params.streamId, {
-			title: req.payload.title
-		})
-		.then((stream) => {
-			res.sign({
-				success: true,
-				stream: stream
-			});
-		});
+	streams.update(req.params.streamId, req.payload)
+	.then((response) => {
+		res.status(response.status).sign(response.data);
 	})
 	.catch((err) => {
 		res.status(500).sign({
