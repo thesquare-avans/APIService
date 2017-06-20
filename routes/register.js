@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const users = require("../lib/users");
+const crypto = require("crypto");
 
 router.post("/", (req, res) => {
 	if(req.user) {
